@@ -15,5 +15,5 @@ fun processFabricMod(jarFile: JarFile, fabricModJsonEntry: JarEntry): Mod {
     val fabricModJsonString = jarFile.getInputStream(fabricModJsonEntry).bufferedReader().use { it.readText() }
     val fabricModJson = json.decodeFromString<FabricModJson>(fabricModJsonString)
 
-    return Mod(fabricModJson.name, fabricModJson.version)
+    return Mod(fabricModJson.name, fabricModJson.version, Mod.Loader.FABRIC)
 }

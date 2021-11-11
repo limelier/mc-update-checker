@@ -19,7 +19,7 @@ fun processForgeMod(jarFile: JarFile): Mod {
         val name = modsToml.getString("mods[0].displayName")
         val version = modsToml.getString("mods[0].version")
 
-        Mod(name, version)
+        Mod(name, version, Mod.Loader.FORGE)
     } else {
         val attribs = jarFile.manifest.mainAttributes
         val name = attribs.getValue("Implementation-Title")
@@ -27,7 +27,7 @@ fun processForgeMod(jarFile: JarFile): Mod {
             ?: ""
         val version = attribs.getValue("Implementation-Version") ?: ""
 
-        Mod(name, version)
+        Mod(name, version, Mod.Loader.FORGE)
     }
 
 }

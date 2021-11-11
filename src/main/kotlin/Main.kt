@@ -1,9 +1,19 @@
 import mods.processMods
+import sources.modrinthLookup
 
 fun main() {
     val rootPath = getMinecraftDirectory()
+    val minecraftVersion = getMinecraftVersion()
 
-    for (mod in processMods(rootPath.resolve("mods"))) {
-        println(mod)
+    val mods = processMods(rootPath.resolve("mods"))
+    val updates = mods.mapNotNull { modrinthLookup(it, minecraftVersion) }
+
+    for (update in updates) {
+        println("""
+            Update available for ${update.mod.name}
+                local: ${update.mod.version}
+                remote: ${update.version}
+                ${update.source}
+        """.trimIndent())
     }
 }
