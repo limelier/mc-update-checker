@@ -1,5 +1,5 @@
 import mods.processMods
-import sources.modrinthLookup
+import sources.modrinth.modrinthLookup
 
 fun main() {
     val rootPath = getMinecraftDirectory()

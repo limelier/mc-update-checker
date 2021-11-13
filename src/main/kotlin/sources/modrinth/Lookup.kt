@@ -1,71 +1,29 @@
-package sources
+package sources.modrinth
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.result.Result
 import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import mods.Mod
+import sources.Update
 import java.net.URL
-import java.time.Instant
 
 private const val apiBaseUrl = "https://api.modrinth.com/api/v1/mod"
 private const val normalBaseUrl = "https://modrinth.com/mod"
 
-@Serializable
-private class SearchResult(
-    val hits: List<ModResult>
-) {
-    @Serializable
-    class ModResult(
-        @SerialName("mod_id")
-        val modId: String
-    )
-}
-
-object InstantSerializer : KSerializer<Instant> {
-    override fun deserialize(decoder: Decoder): Instant {
-        val str = decoder.decodeString()
-        return Instant.parse(str)
-    }
-
-    override val descriptor: SerialDescriptor
-        get() = PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: Instant) {
-        encoder.encodeString(value.toString())
-    }
-}
-
-@Serializable
-private class Version(
-    @SerialName("game_versions")
-    val gameVersions: List<String>,
-
-    @SerialName("version_number")
-    val versionNumber: String,
-
-    @Serializable(InstantSerializer::class)
-    @SerialName("date_published")
-    val datePublished: Instant
-)
-
 private val json = Json { ignoreUnknownKeys = true }
 
-fun modrinthLookup(mod: Mod, minecraftVersion: String): Update? {
+private fun findModId(mod: Mod, minecraftVersion: String): String? {
     val facets = Json.encodeToString(listOf(
         listOf("categories:${mod.loader.toString().lowercase()}"),
         listOf("versions:${minecraftVersion}")
     ))
+
     val (_, _, searchQueryResult) = Fuel
         .get(apiBaseUrl, listOf("query" to mod.name, "facets" to facets))
         .responseString()
-
     if (searchQueryResult is Result.Failure) return null
+
     val searchResult = json.decodeFromString<SearchResult>(searchQueryResult.get())
     if (searchResult.hits.isEmpty()) return null
 
@@ -73,7 +31,11 @@ fun modrinthLookup(mod: Mod, minecraftVersion: String): Update? {
         println("<!> There's more than one hit for ${mod.name}, picking the first for now") // todo give user choice
     }
 
-    val modId = searchResult.hits[0].modId.substringAfter("local-")
+    return searchResult.hits[0].modId.substringAfter("local-")
+}
+
+fun modrinthLookup(mod: Mod, minecraftVersion: String): Update? {
+    val modId = findModId(mod, minecraftVersion) ?: return null
 
     val (_, _, modQueryResult) = Fuel
         .get("${apiBaseUrl}/${modId}/version")
