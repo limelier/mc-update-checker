@@ -11,8 +11,7 @@ fun main() {
     for (update in updates) {
         println("""
             Update available for ${update.mod.name}
-                local: ${update.mod.version}
-                remote: ${update.version}
+                ${update.mod.version} -> ${update.version}
                 ${update.source}
         """.trimIndent())
     }
