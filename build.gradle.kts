@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.3.1")
     implementation("com.moandjiezana.toml:toml4j:0.7.2")
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.31")
