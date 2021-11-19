@@ -15,5 +15,7 @@ class Version(
 
     @Serializable(InstantJsonSerializer::class)
     @SerialName("date_published")
-    val datePublished: Instant
+    val datePublished: Instant,
+
+    val loaders: List<String>,
 )

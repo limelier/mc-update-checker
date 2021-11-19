@@ -42,7 +42,9 @@ fun modrinthLookup(mod: Mod, minecraftVersion: String): Update? {
         .responseString()
     if (modQueryResult is Result.Failure) return null
     val versions = json.decodeFromString<List<Version>>(modQueryResult.get())
-    val compatibleVersions = versions.filter { it.gameVersions.contains(minecraftVersion) } // todo filter for loader too
+    val compatibleVersions = versions.filter {
+        it.gameVersions.contains(minecraftVersion) && it.loaders.contains(mod.loader.toString().lowercase())
+    }
 
     val thisVersion = compatibleVersions.firstOrNull { it.versionNumber == mod.version } ?: return null
     val latestVersion = compatibleVersions.maxByOrNull { it.datePublished } ?: return null
